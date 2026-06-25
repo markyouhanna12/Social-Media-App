@@ -5,27 +5,19 @@ import rateLimit, { RateLimitRequestHandler } from "express-rate-limit"
 import AuthRouter from "./Modules/Auth/auth.controller"
 import { globalErrorHandler, NotFoundException } from "./Utils/response/error.response"
 import { corsOptions } from "./Utils/cors/cors.utils"
+import { customRateLimiter } from "./Middlewares/rateLimitter.middleware"
 // import UserRouter from "./Modules/User/user.controller"
 // import PostRouter from "./Modules/Post/post.controller"
 // import CommentsRouter from "./Modules/Comments/comments.controller"
 
 const app = express()
 
-const limiter :RateLimitRequestHandler  = rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 20, // limit each IP to 20 requests per windowMs
-    message:{
-        statusCode : 429,
-        message : "Too many requests, please try again later."  
-    }
-});
-
 
 
 app.use(express.json())
 app.use(cors(corsOptions))
 app.use(helmet())
-app.use(limiter)
+app.use(customRateLimiter)
 
 app.use("/api/auth", AuthRouter)
 // app.use("/api/user", UserRouter)
