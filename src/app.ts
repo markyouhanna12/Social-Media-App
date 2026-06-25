@@ -2,6 +2,11 @@ import express, { Request, Response } from "express"
 import cors from "cors"
 import helmet from "helmet"
 import rateLimit, { RateLimitRequestHandler } from "express-rate-limit"
+import AuthRouter from "./Modules/Auth/auth.controller"
+import { globalErrorHandler, NotFoundException } from "./Utils/response/error.response"
+// import UserRouter from "./Modules/User/user.controller"
+// import PostRouter from "./Modules/Post/post.controller"
+// import CommentsRouter from "./Modules/Comments/comments.controller"
 
 const app = express()
 
@@ -21,8 +26,15 @@ app.use(cors())
 app.use(helmet())
 app.use(limiter)
 
+app.use("/api/auth", AuthRouter)
+// app.use("/api/user", UserRouter)
+// app.use("/api/post", PostRouter)
+// app.use("/api/comments", CommentsRouter)
+
+app.use(globalErrorHandler)
+
 app.use("/*dummy" , (req :Request, res: Response) : Response => {
-    return res.status(404).json({message : "Not Found Handler!!"})
+    throw new NotFoundException("Not Found Handler!")
     
 })
 
