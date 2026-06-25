@@ -1,7 +1,7 @@
 import chalk from "chalk"
 import app from "./app"
+import { PORT } from "./config/config.service";
 
-const PORT = 3000
 
 const startServer = async () =>{
     try {
