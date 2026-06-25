@@ -3,7 +3,7 @@ import authService from "./auth.service";
 
 const router: Router  = express.Router()
 
-router.get("/signup" , authService.signup)
+router.post("/signup" , authService.signup)
 // router.get("/login" , authService.login)
 
 

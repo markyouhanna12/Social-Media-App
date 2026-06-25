@@ -1,15 +1,34 @@
 import { Request, Response } from "express";
 import { successResponse } from "../../Utils/response/success.response";
-import { SignupDTO } from "./auth.DTO";
+import {signupDTOBody } from "./auth.DTO";
+import { signupSchema } from "./auth.validation";
+import { BadRequestException } from "../../Utils/response/error.response";
 
 class AuthenticationService {
-
-    private _username : string = "mark"
 
     constructor(){}
 
     signup = (req: Request , res : Response) : Response =>{
-      return successResponse({res , statusCode: 200 , message:"Hello From signup"})
+
+      const {username , email , password , confirmPassword } : signupDTOBody = req.body
+
+      // TODO: Validate the data
+      try {
+
+        signupSchema.body.parse({username , email , password , confirmPassword})
+        
+      } catch (error) {
+
+        throw new BadRequestException("Invalid data", {cause : error})
+        
+      }
+
+      return successResponse({
+        res , 
+        statusCode: 200 , 
+        message:"User created successfully" , 
+        data : {username , email , password , confirmPassword}
+      })
     }
     
 
