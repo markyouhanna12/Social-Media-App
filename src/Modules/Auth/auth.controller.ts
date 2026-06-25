@@ -1,9 +1,10 @@
 import express, { Router } from "express";
 import authService from "./auth.service";
-
+import { validation } from "../../Middlewares/Validation.middleware";
+import * as authValidation from "./auth.validation";
 const router: Router  = express.Router()
 
-router.post("/signup" , authService.signup)
+router.post("/signup" ,validation(authValidation.signupSchema) , authService.signup)
 // router.get("/login" , authService.login)
 
 
