@@ -9,3 +9,8 @@ export enum RoleEnum {
     USER = "user",
     ADMIN = "admin"
 }
+
+export enum SignatureEnum{
+    USER = 0,
+    ADMIN = 1
+}
