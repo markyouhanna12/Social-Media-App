@@ -21,7 +21,7 @@ export const signupSchema ={
 
         confirmPassword : generalFields.password,
         
-        gender : generalFields.gender,
+        gender : generalFields.gender.optional(),
 
         skills : generalFields.skills.optional(),
 

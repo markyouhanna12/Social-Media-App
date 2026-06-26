@@ -14,7 +14,7 @@ class AuthenticationService {
 
     signup = async (req: Request , res : Response) : Promise<Response> =>{
 
-      const {username , email , password , gender , role} : signupDTO = req.body
+      const {username , email , password} : signupDTO = req.body
 
       const checkUser = await this._userModel.findOne({
         filter : {email},
@@ -26,12 +26,13 @@ class AuthenticationService {
       }
 
       const user = await this._userModel.create({
-        data: {
+        data: [{
           username,
           email,
           password,
-          ...(gender && { gender })
-        }
+          
+        }],
+        options:{validateBeforeSave:true}
       } )
   
       return successResponse({

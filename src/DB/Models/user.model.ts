@@ -19,7 +19,7 @@ export interface IUser {
     phone?: string;
     address?: string;
 
-    gender: GenderEnum;
+    gender?: GenderEnum;
     role?: RoleEnum;
 
     createdAt : Date;
