@@ -76,6 +76,11 @@ export const generalFields = {
         .max(120, {error: "Age must be at most 120"}),
 
     role : z
-        .enum(["user", "admin"], {error: "Role must be user or admin"})
+        .enum(["user", "admin"], {error: "Role must be user or admin"}),
+    
+    phone : z
+        .string()
+        .min(10, {error: "Phone must be at least 10 characters"})
+        .max(15, {error: "Phone must be at most 15 characters"})
         
 }

@@ -27,6 +27,8 @@ export const signupSchema ={
 
         age : generalFields.age.optional(),
 
+        phone : generalFields.phone,
+
         role : generalFields.role.optional(),
 
     }).superRefine((data, ctx) => {

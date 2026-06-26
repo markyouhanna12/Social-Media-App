@@ -5,6 +5,8 @@ import { signupSchema } from "./auth.validation";
 import { BadRequestException, ConflictException } from "../../Utils/response/error.response";
 import { HUserDocument, UserModel } from "../../DB/Models/user.model";
 import { UserRepository } from "../../DB/repositories/user.repo";
+import { genrateHash } from "../../Utils/security/hash";
+import { encrypt } from "../../Utils/security/encryption";
 
 class AuthenticationService {
 
@@ -14,7 +16,7 @@ class AuthenticationService {
 
     signup = async (req: Request , res : Response) : Promise<Response> =>{
 
-      const {username , email , password} : signupDTO = req.body
+      const {username , email , password , phone } : signupDTO = req.body
 
       const checkUser = await this._userModel.findOne({
         filter : {email},
@@ -29,7 +31,8 @@ class AuthenticationService {
         data: [{
           username,
           email,
-          password,
+          password: await genrateHash(password) ,
+          phone : await encrypt(phone)
           
         }],
         options:{validateBeforeSave:true}
