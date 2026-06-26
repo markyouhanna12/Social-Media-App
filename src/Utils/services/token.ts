@@ -1,9 +1,21 @@
-import jwt from "jsonwebtoken"
-import { RoleEnum, SignatureEnum } from "../enums/auth.enum"
+import jwt, { JwtPayload } from "jsonwebtoken"
+import { RoleEnum, SignatureEnum, TokenTypeEnum } from "../enums/auth.enum"
 import { ACCESS_EXPIRES, REFRESH_EXPIRES, TOKEN_ACCESS_ADMIN_SECRET_KEY, TOKEN_ACCESS_USER_SECRET_KEY, TOKEN_REFRESH_ADMIN_SECRET_KEY, TOKEN_REFRESH_USER_SECRET_KEY } from "../../config/config.service"
 import { v4 as uuid } from 'uuid';
+import { BadRequestException, NotFoundException } from "../response/error.response";
+import { UserRepository } from "../../DB/repositories/user.repo";
+import { HUserDocument, UserModel } from "../../DB/Models/user.model";
+
+
+export interface CustomJwtPayload extends JwtPayload{
+    id :string;
+    jti :string
+}
 
 export class TokenService {
+
+    private readonly _userRepo = new UserRepository(UserModel)
+
     constructor(){}
 
     sign = async (
@@ -17,9 +29,9 @@ export class TokenService {
 
     verify = async (
         token : string ,
-         secret :string) => {
+         secret :string) : Promise<CustomJwtPayload> => {
 
-        return jwt.verify(token , secret)
+        return jwt.verify(token , secret) as CustomJwtPayload
     }
 
 
@@ -60,16 +72,53 @@ export class TokenService {
         const jwtid = uuid()
 
         const accessToken = await this.sign(
-            {_id:user._id , jti:jwtid},
+            {id:user._id , jti:jwtid},
              signature.accessSignature, 
              {expiresIn: Number(ACCESS_EXPIRES)})
 
         const refreshToken = await this.sign(
-            {_id:user._id , jti:jwtid}, 
+            {id:user._id , jti:jwtid}, 
             signature.refreshSignature, 
             {expiresIn: Number(REFRESH_EXPIRES)})
             
         return {accessToken, refreshToken}
+    }
+
+
+    decodedToken = async ({
+        authorization , 
+        tokenType = TokenTypeEnum.ACCESS
+    }:{
+        authorization:string ; 
+        tokenType?:TokenTypeEnum
+    }) : Promise<{user:HUserDocument; decoded : CustomJwtPayload}> =>{
+
+        if(!authorization){
+            throw new BadRequestException("Authorization Header is missing")
+        }
+        const [Bearer , token ] = authorization.split(" ")|| []
+        if(!Bearer || !token){
+            throw new BadRequestException("Invalid Token Format")
+        }
+
+        let signature = await this.getSignature({SignatureLevel:
+            Bearer === "Admin" ? SignatureEnum.ADMIN :SignatureEnum.USER})
+
+        const secret = tokenType === TokenTypeEnum.ACCESS 
+        ? signature.accessSignature : signature.refreshSignature
+
+        const decoded = await this.verify(token , secret)
+
+        const user = await this._userRepo.findById({id : decoded.id})
+
+        if(!user){
+            throw new NotFoundException("Not Registered Account")
+        }
+
+        return {decoded , user}
+
+
+        
     }
 
 }

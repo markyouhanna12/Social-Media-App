@@ -14,3 +14,8 @@ export enum SignatureEnum{
     USER = 0,
     ADMIN = 1
 }
+
+export enum TokenTypeEnum{
+    ACCESS = "ACCESS",
+    REFRESH = "REFRESH"
+}
