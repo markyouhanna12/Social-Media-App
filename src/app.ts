@@ -6,13 +6,14 @@ import AuthRouter from "./Modules/Auth/auth.controller"
 import { globalErrorHandler, NotFoundException } from "./Utils/response/error.response"
 import { corsOptions } from "./Utils/cors/cors.utils"
 import { customRateLimiter } from "./Middlewares/rateLimitter.middleware"
+import connectDB from "./DB/connection"
 // import UserRouter from "./Modules/User/user.controller"
 // import PostRouter from "./Modules/Post/post.controller"
 // import CommentsRouter from "./Modules/Comments/comments.controller"
 
 const app = express()
 
-
+connectDB()
 
 app.use(express.json())
 app.use(cors(corsOptions))

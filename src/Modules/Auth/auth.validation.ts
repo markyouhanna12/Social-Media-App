@@ -21,11 +21,13 @@ export const signupSchema ={
 
         confirmPassword : generalFields.password,
         
-        gender : generalFields.gender.optional(),
+        gender : generalFields.gender,
 
         skills : generalFields.skills.optional(),
 
-        age : generalFields.age.optional()
+        age : generalFields.age.optional(),
+
+        role : generalFields.role.optional(),
 
     }).superRefine((data, ctx) => {
         if(data.password !== data.confirmPassword) {

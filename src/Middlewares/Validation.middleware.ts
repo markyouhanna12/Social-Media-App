@@ -72,6 +72,9 @@ export const generalFields = {
         .number()
         .int()
         .min(18, {error: "Age must be at least 18"})
-        .max(120, {error: "Age must be at most 120"})
+        .max(120, {error: "Age must be at most 120"}),
+
+    role : z
+        .enum(["user", "admin"], {error: "Role must be user or admin"})
         
 }
