@@ -81,6 +81,9 @@ export const generalFields = {
     phone : z
         .string()
         .min(10, {error: "Phone must be at least 10 characters"})
-        .max(15, {error: "Phone must be at most 15 characters"})
-        
+        .max(15, {error: "Phone must be at most 15 characters"}),
+    
+    otp : z
+        .string()
+        .regex(/^[0-9]{6}$/)
 }

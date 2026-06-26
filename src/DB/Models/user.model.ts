@@ -11,7 +11,7 @@ export interface IUser {
 
     email : string;
     confirmEmailOTP?: string;
-    confirmEmail?: Date;
+    confirmEmailAt?: Date;
 
     password : string;
     resetPasswordOTP?: string;
@@ -53,7 +53,7 @@ export const userSchema = new Schema<IUser>({
     confirmEmailOTP: {
         type: String
     },
-    confirmEmail: {
+    confirmEmailAt: {
         type: Date
     },
     password: {

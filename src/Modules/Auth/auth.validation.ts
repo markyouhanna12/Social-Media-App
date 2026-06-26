@@ -52,4 +52,13 @@ export const signupSchema ={
 }
 
 
+export const confirmEmailSchema ={
+    body : z.strictObject({
+    
+        email :generalFields.email,
+
+        otp : generalFields.otp,
+
+    })
+}
 

@@ -1,11 +1,11 @@
 import { Request, Response } from "express";
 import { successResponse } from "../../Utils/response/success.response";
-import { signupDTO } from "./auth.DTO";
+import { confirmEmailDTO, signupDTO } from "./auth.DTO";
 import { signupSchema } from "./auth.validation";
-import { BadRequestException, ConflictException } from "../../Utils/response/error.response";
+import { BadRequestException, ConflictException, NotFoundException } from "../../Utils/response/error.response";
 import { HUserDocument, UserModel } from "../../DB/Models/user.model";
 import { UserRepository } from "../../DB/repositories/user.repo";
-import { genrateHash } from "../../Utils/security/hash";
+import { compareHash, genrateHash } from "../../Utils/security/hash";
 import { encrypt } from "../../Utils/security/encryption";
 import { generateOTP } from "../../Utils/generateOTP";
 import { emailEvents } from "../../Utils/events/email.event";
@@ -30,7 +30,7 @@ class AuthenticationService {
       }
 
       const otp = generateOTP()
-
+      
       const user = await this._userModel.create({
         data: [{
           username,
@@ -56,6 +56,41 @@ class AuthenticationService {
         message:"User created successfully" , 
         data : { user }
       })
+    }
+
+    confirmEmail = async (req: Request , res : Response) : Promise<Response> =>{
+      const {email , otp} : confirmEmailDTO = req.body
+
+
+      const user = await this._userModel.findOne({
+        filter: {
+          email,
+          confirmEmailOTP: {$exists :true}, confirmEmailAt:{$exists : false}
+        }
+      })
+
+      if(!user){
+        throw new NotFoundException("User Not Found or Already confirmed")
+      }
+
+      if(!compareHash(otp , user?.confirmEmailOTP as string)){
+        throw new BadRequestException("Invalid OTP")
+      }
+
+      await this._userModel.updateOne({
+        filter:{email},
+        update:{
+          confirmEmailAt : Date.now() ,
+          $unset :{confirmEmailOTP : true}
+        }
+      })
+
+      return successResponse({
+        res , 
+        statusCode: 200 , 
+        message:"Email confirmed successfully"})
+
+  
     }
     
 
