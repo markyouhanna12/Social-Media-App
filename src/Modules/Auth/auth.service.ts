@@ -7,6 +7,8 @@ import { HUserDocument, UserModel } from "../../DB/Models/user.model";
 import { UserRepository } from "../../DB/repositories/user.repo";
 import { genrateHash } from "../../Utils/security/hash";
 import { encrypt } from "../../Utils/security/encryption";
+import { generateOTP } from "../../Utils/generateOTP";
+import { emailEvents } from "../../Utils/events/email.event";
 
 class AuthenticationService {
 
@@ -27,16 +29,26 @@ class AuthenticationService {
         throw new ConflictException("User already exists")
       }
 
+      const otp = generateOTP()
+
       const user = await this._userModel.create({
         data: [{
           username,
           email,
           password: await genrateHash(password) ,
-          phone : await encrypt(phone)
+          phone : await encrypt(phone),
+          confirmEmailOTP : await genrateHash(otp)
           
         }],
         options:{validateBeforeSave:true}
       } )
+
+      await emailEvents.emit("confirmEmail" ,{
+        to: email,
+        username ,
+        otp
+      
+      })
   
       return successResponse({
         res , 
