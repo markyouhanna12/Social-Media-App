@@ -72,7 +72,6 @@ export const userSchema = new Schema<IUser>({
     gender: {
         type: String,
         enum: Object.values(GenderEnum),
-        required: true
     },
     role: {
         type: String,

@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express"
 import {z, ZodError} from "zod"
 import { BadRequestException } from "../Utils/response/error.response"
+import { GenderEnum } from "../Utils/enums/auth.enum"
 
 
 type KeyReqType = keyof Request;
@@ -64,7 +65,7 @@ export const generalFields = {
         .min(6, {error: "Confirm Password must be at least 6 characters"}),
 
     gender : z
-        .enum(["male", "female"], {error: "Gender must be male or female"}),
+        .nativeEnum(GenderEnum, {error: "Gender must be male or female"}),
 
     skills : z.array(z.string()),
 

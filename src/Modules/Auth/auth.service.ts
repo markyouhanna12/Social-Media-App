@@ -2,10 +2,13 @@ import { Request, Response } from "express";
 import { successResponse } from "../../Utils/response/success.response";
 import { signupDTO } from "./auth.DTO";
 import { signupSchema } from "./auth.validation";
-import { BadRequestException } from "../../Utils/response/error.response";
+import { BadRequestException, ConflictException } from "../../Utils/response/error.response";
 import { HUserDocument, UserModel } from "../../DB/Models/user.model";
+import { UserRepository } from "../../DB/repositories/user.repo";
 
 class AuthenticationService {
+
+    private _userModel = new UserRepository(UserModel)
 
     constructor(){}
 
@@ -13,15 +16,23 @@ class AuthenticationService {
 
       const {username , email , password , gender , role} : signupDTO = req.body
 
-      const user : HUserDocument = await new UserModel({
-        username,
-        email,
-        password,
-        gender,
-        role
+      const checkUser = await this._userModel.findOne({
+        filter : {email},
+        select : "email"
       })
-      await user.save()
 
+      if(checkUser){
+        throw new ConflictException("User already exists")
+      }
+
+      const user = await this._userModel.create({
+        data: {
+          username,
+          email,
+          password,
+          ...(gender && { gender })
+        }
+      } )
   
       return successResponse({
         res , 
