@@ -10,9 +10,10 @@ import { encrypt } from "../../Utils/security/encryption";
 import { generateOTP } from "../../Utils/generateOTP";
 import { emailEvents } from "../../Utils/events/email.event";
 import { TokenService } from "../../Utils/services/token";
-import { LogoutTypeEnum } from "../../Utils/enums/auth.enum";
+import { LogoutTypeEnum, ProviderEnum } from "../../Utils/enums/auth.enum";
 import { revokeTokenKey, set, ttl } from "../../DB/redis.repository";
-import { ACCESS_EXPIRES } from "../../config/config.service";
+import { ACCESS_EXPIRES, Client_ID } from "../../config/config.service";
+import {OAuth2Client} from "google-auth-library"
 
 class AuthenticationService {
 
@@ -160,6 +161,73 @@ class AuthenticationService {
         statusCode : status 
         , message :"Logout successfully"})
     }
+
+     verifyGoogleAccount = async ({idToken} : {idToken: string}) =>{
+
+      const client = new OAuth2Client()
+      const ticket = await client.verifyIdToken({
+        idToken,
+        audience:Client_ID
+      })
+
+      const payload = ticket.getPayload()
+
+      return payload;
+    }
+
+
+
+    loginWithGoogle = async (req: Request, res: Response) : Promise<Response> =>{
+
+    const {idToken} = req.body
+    // verify with Google Auth Library
+    const {email , picture , given_name , family_name , email_verified } : any = await this.verifyGoogleAccount({idToken})
+
+    console.log({email , picture , given_name , family_name , email_verified });
+    
+
+    // logic bussiness
+    if(!email_verified){
+      throw new BadRequestException("Email not verifed")
+    }
+
+    let user = await this._userRepo.findOne({filter:{email}})
+
+    if(user){
+      if(user.provider === ProviderEnum.Google){
+        const credentails = await this._tokenService.getNewLoginCredentials(user as any)
+
+        return successResponse({
+          res , 
+          statusCode: 200 , 
+          message:"Login successful",
+          data: { credentails }
+        })
+      }
+    }
+
+    const newUser = await this._userRepo.create({
+      data:[{
+        email,
+        firstName:given_name,
+        lastName:family_name,
+        profilePic:picture,
+        provider:ProviderEnum.Google
+      }]
+    })
+
+    const credentails = await this._tokenService.getNewLoginCredentials(newUser as any)
+
+    return successResponse({
+      res ,
+      statusCode: 201 ,
+      message:"User created successfully",
+      data: { credentails }
+    })
+
+    
+
+}
     
 
 }

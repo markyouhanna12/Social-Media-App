@@ -24,6 +24,11 @@ router.patch("/logout" ,
     validation(authValidation.logoutSchema),
     authService.logoutWithRedis)
 
+router.post("/social-login",authService.loginWithGoogle)
+
+
+
+
 
 
 export default router

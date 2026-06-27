@@ -69,3 +69,4 @@ export const logoutSchema = {
         flag : z.enum(LogoutTypeEnum),
     })
 }
+

@@ -24,3 +24,9 @@ export enum LogoutTypeEnum {
     logoutFromAll = "logoutFromAll",
     logout = "logout"
 }
+
+
+export enum ProviderEnum {
+    Google = "google",
+    System = "System"
+}
