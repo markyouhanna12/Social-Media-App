@@ -24,6 +24,8 @@ export interface IUser {
 
     createdAt : Date;
     updatedAt? : Date;
+
+    changeCredentialsTime?:Date
 }
         
 
@@ -77,6 +79,9 @@ export const userSchema = new Schema<IUser>({
         type: String,
         enum: Object.values(RoleEnum),
         default: RoleEnum.USER
+    },
+    changeCredentialsTime :{
+        type : Date
     }
 
 
