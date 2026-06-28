@@ -1,3 +1,4 @@
+import { Types } from "mongoose";
 import { redisClient } from "./redis.connection";
 
 
@@ -171,4 +172,26 @@ export const keys = async (pattern : string) : Promise<string[] | null> =>{
         console.log("Redis Keys Error",error);
         return null
     }
+}
+
+
+export const FCM_KEY = (userId: Types.ObjectId | string) =>{
+    return `user:FCM:${userId.toString()}`
+}
+
+
+export const addFCM = async (userId : Types.ObjectId | string , FCMToken : string ) =>{
+
+    return await redisClient.sAdd(FCM_KEY(userId) , FCMToken)
+}
+
+export const removeFCM = async (userId : Types.ObjectId | string , FCMToken : string ) =>{
+
+    return await redisClient.sRem(FCM_KEY(userId) , FCMToken)
+}
+
+
+export const getFCM = async (userId : Types.ObjectId | string ) =>{
+
+    return await redisClient.sMembers(FCM_KEY(userId))
 }
