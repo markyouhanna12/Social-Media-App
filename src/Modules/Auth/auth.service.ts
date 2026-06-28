@@ -44,20 +44,14 @@ class AuthenticationService {
         data: [{
           username,
           email,
-          password: await genrateHash(password) ,
-          phone : await encrypt(phone),
+          password ,
+          phone ,
           confirmEmailOTP : await genrateHash(otp)
           
         }],
         options:{validateBeforeSave:true}
       } )
 
-      await emailEvents.emit("confirmEmail" ,{
-        to: email,
-        username ,
-        otp
-      
-      })
   
       return successResponse({
         res , 
@@ -182,8 +176,6 @@ class AuthenticationService {
     const {idToken} = req.body
     // verify with Google Auth Library
     const {email , picture , given_name , family_name , email_verified } : any = await this.verifyGoogleAccount({idToken})
-
-    console.log({email , picture , given_name , family_name , email_verified });
     
 
     // logic bussiness

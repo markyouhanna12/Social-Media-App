@@ -1,6 +1,12 @@
 import { Schema , HydratedDocument } from "mongoose";
 import { GenderEnum, ProviderEnum, RoleEnum } from "../../Utils/enums/auth.enum";
 import mongoose from "mongoose";
+import { BadRequestException } from "../../Utils/response/error.response";
+import { genrateHash } from "../../Utils/security/hash";
+import { encrypt } from "../../Utils/security/encryption";
+import { emailEvents } from "../../Utils/events/email.event";
+import { ota } from "zod/v4/locales";
+import { generateOTP } from "../../Utils/generateOTP";
 
 // interface
 export interface IUser {
@@ -16,7 +22,7 @@ export interface IUser {
     password : string;
     resetPasswordOTP?: string;
 
-    phone?: string;
+    phone: string;
     address?: string;
 
     gender?: GenderEnum;
@@ -70,7 +76,8 @@ export const userSchema = new Schema<IUser>({
         type: String
     },
     phone: {
-        type: String
+        type: String,
+        required : true
     },
     address: {
         type: String
@@ -116,6 +123,42 @@ userSchema
     .get(function() {
         return `${this.firstName} ${this.lastName}`
     })
+
+
+    // Document middleware validate
+    userSchema.pre("validate" , function() {
+        
+        this.email = this.email.toLowerCase().trim()
+    })
+
+    userSchema.pre("save", async function(this : HUserDocument & {wasNew : boolean}) {
+        // logic of middleware
+        this.wasNew = this.isNew
+        if(this.isModified("password")) {
+
+            this.password = await genrateHash(this.password)
+        }
+
+        if(this.isModified("phone")){
+            this.phone = await encrypt(this.phone)
+        }
+
+        
+    })
+
+    // Document middleware save
+
+    userSchema.post("save" , async function (){
+        const that = this as HUserDocument & {wasNew : boolean}
+        if(that.wasNew){
+            await emailEvents.emit("confirmEmail" ,{
+                to: this.email,
+                username: this.username,
+                otp : generateOTP()
+            })
+        }
+    })
+  
 
 export const UserModel = mongoose.model<IUser>("User", userSchema)
 
