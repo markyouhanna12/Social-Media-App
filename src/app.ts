@@ -9,6 +9,7 @@ import { customRateLimiter } from "./Middlewares/rateLimitter.middleware"
 import connectDB from "./DB/connection"
 import UserRouter from "./Modules/User/user.controller"
 import { redisConnection } from "./DB/redis.connection"
+import { notification } from "./Utils/services/notification.service"
 // import PostRouter from "./Modules/Post/post.controller"
 // import CommentsRouter from "./Modules/Comments/comments.controller"
 
@@ -21,6 +22,13 @@ app.use(express.json())
 app.use(cors(corsOptions))
 app.use(helmet())
 app.use(customRateLimiter)
+
+// app.post("/send-notification" , (req : Request , Response : Response) =>{
+//     notification.sendNotification({token : req.body.token , data : {
+//         title : "First notification",
+//         body : "body of notification"
+//     }})
+// })
 
 app.use("/api/auth", AuthRouter)
 app.use("/api/user", UserRouter)
