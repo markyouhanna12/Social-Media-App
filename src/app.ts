@@ -10,7 +10,7 @@ import connectDB from "./DB/connection"
 import UserRouter from "./Modules/User/user.controller"
 import { redisConnection } from "./DB/redis.connection"
 import { notification } from "./Utils/services/notification.service"
-// import PostRouter from "./Modules/Post/post.controller"
+import PostRouter from "./Modules/Post/post.controller"
 // import CommentsRouter from "./Modules/Comments/comments.controller"
 
 const app = express()
@@ -32,7 +32,7 @@ app.use(customRateLimiter)
 
 app.use("/api/auth", AuthRouter)
 app.use("/api/user", UserRouter)
-// app.use("/api/post", PostRouter)
+app.use("/api/post", PostRouter)
 // app.use("/api/comments", CommentsRouter)
 
 app.use(globalErrorHandler)

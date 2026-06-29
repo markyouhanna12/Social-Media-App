@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from "express"
 import {z, ZodError} from "zod"
 import { BadRequestException } from "../Utils/response/error.response"
 import { GenderEnum } from "../Utils/enums/auth.enum"
+import { Types } from "mongoose";
 
 
 type KeyReqType = keyof Request;
@@ -88,6 +89,22 @@ export const generalFields = {
         .regex(/^[0-9]{6}$/),
 
     FCM : z
-        .string()
+        .string(),
 
+    file : function (mimeType: string[]) {
+        return z.strictObject({
+            fieldname: z.string(),
+            originalname: z.string(),
+            encoding: z.string(),
+            mimetype: z.enum(mimeType),
+            size: z.number(),
+            path: z.string().optional(),
+            buffer: z.any().optional()
+        })
+    },
+    id : z
+        .string()
+        .refine((value) =>{
+            return Types.ObjectId.isValid(value)
+        } , "Invalid ObjectId")
 }

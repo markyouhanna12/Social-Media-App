@@ -30,3 +30,10 @@ export enum ProviderEnum {
     Google = "google",
     System = "System"
 }
+
+export enum AvailabitlityEnum {
+    PUBLIC,
+    FRIENDS,
+    ONLY_ME
+    
+}
