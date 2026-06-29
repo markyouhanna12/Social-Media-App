@@ -11,6 +11,8 @@ export const loginSchema ={
 
         password : generalFields.password,
 
+        FCM : generalFields.FCM.optional()
+
     })
 }
 

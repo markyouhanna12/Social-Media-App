@@ -85,5 +85,9 @@ export const generalFields = {
     
     otp : z
         .string()
-        .regex(/^[0-9]{6}$/)
+        .regex(/^[0-9]{6}$/),
+
+    FCM : z
+        .string()
+
 }

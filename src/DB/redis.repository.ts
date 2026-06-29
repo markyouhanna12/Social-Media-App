@@ -191,7 +191,7 @@ export const removeFCM = async (userId : Types.ObjectId | string , FCMToken : st
 }
 
 
-export const getFCM = async (userId : Types.ObjectId | string ) =>{
+export const getFCMs = async (userId : Types.ObjectId | string ) =>{
 
     return await redisClient.sMembers(FCM_KEY(userId))
 }

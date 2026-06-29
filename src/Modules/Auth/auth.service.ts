@@ -11,9 +11,10 @@ import { generateOTP } from "../../Utils/generateOTP";
 import { emailEvents } from "../../Utils/events/email.event";
 import { TokenService } from "../../Utils/services/token";
 import { LogoutTypeEnum, ProviderEnum } from "../../Utils/enums/auth.enum";
-import { revokeTokenKey, set, ttl } from "../../DB/redis.repository";
+import { addFCM, getFCMs, revokeTokenKey, set, ttl } from "../../DB/redis.repository";
 import { ACCESS_EXPIRES, Client_ID } from "../../config/config.service";
 import {OAuth2Client} from "google-auth-library"
+import { notification } from "../../Utils/services/notification.service";
 
 class AuthenticationService {
 
@@ -98,7 +99,7 @@ class AuthenticationService {
 
     login = async (req: Request , res : Response) : Promise<Response> =>{
 
-      const {email , password} : loginDTO = req.body
+      const {email , password , FCM} : loginDTO = req.body
 
       const user = await this._userRepo.findOne({
         filter: {
@@ -112,6 +113,19 @@ class AuthenticationService {
       }
       if(!await compareHash(password , user.password)){
         throw new BadRequestException("Invalid password")
+      }
+
+      if(FCM){
+        await addFCM(user._id , FCM)
+        const tokens = await getFCMs(user._id)
+        console.log(tokens);
+        
+        if(tokens?.length){
+          await notification.sendNotifications({
+            tokens,
+            data:{title: "Login" , body : `New Login at ${Date.now()}`}
+          })
+        }
       }
 
       const credentails = await this._tokenService.getNewLoginCredentials(user as any)
