@@ -1,6 +1,6 @@
 // Base repository for database operations --> Parent class for all repositories
 // abstraction principle
-import { Model ,QueryFilter , ProjectionType, QueryOptions, PopulateOptions, CreateOptions, UpdateQuery, InsertManyOptions, UpdateWriteOpResult, MongooseUpdateQueryOptions } from "mongoose";
+import { Model ,QueryFilter , ProjectionType, QueryOptions, PopulateOptions, CreateOptions, UpdateQuery, InsertManyOptions, UpdateWriteOpResult, MongooseUpdateQueryOptions, SaveOptions, HydratedDocument } from "mongoose";
 
 export abstract class DatabaseRepository<TDocument> {
 
@@ -45,9 +45,9 @@ export abstract class DatabaseRepository<TDocument> {
 
 
     async create({data , options}:{
-        data : Partial<TDocument> | Array<Partial<TDocument>>
-        options? : CreateOptions | undefined
-    }) {
+        data : Partial<TDocument>[] | Array<Partial<TDocument>>
+        options? : SaveOptions | undefined
+    }) : Promise<HydratedDocument<TDocument>[] | undefined> {
         return await this.model.create(data as any, options)
     }
 
@@ -65,6 +65,10 @@ export abstract class DatabaseRepository<TDocument> {
         if(options?.populate){
             doc.populate(options.populate as PopulateOptions[])
         }
+        
+        if(options?.skip) doc.skip(options.skip)
+        if(options?.limit) doc.limit(options.limit)
+
         return await doc.exec()
     }
 

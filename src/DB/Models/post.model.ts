@@ -4,12 +4,12 @@ import { AvailabitlityEnum } from "../../Utils/enums/auth.enum";
 
 export interface IPost {
     folderId ? : string;
-    content ? : string;
+    content ? : string | undefined;
     attachments ? : string[];
 
     likes ? : Types.ObjectId[] | IUser[];
     tags ? : Types.ObjectId[] | string[];
-    availabitlity ? : AvailabitlityEnum
+    availability ? : AvailabitlityEnum
    
 
     createdBy : Types.ObjectId | IUser
@@ -40,7 +40,7 @@ const postSchema = new Schema<IPost>({
         type : [String],
         default : []
     },
-    availabitlity : {
+    availability : {
         type : Number,
         enum : AvailabitlityEnum,
         default : AvailabitlityEnum.PUBLIC
