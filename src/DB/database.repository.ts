@@ -103,20 +103,19 @@ export abstract class DatabaseRepository<TDocument> {
         filter ,
         update ,
         select ,
-        options
+        options = {new : true}
     }:{
         filter? : QueryFilter<TDocument>
         update? : UpdateQuery<TDocument>
         select? : ProjectionType<TDocument> | null
         options? : QueryOptions<TDocument> | null
     }) {
-        const doc = this.model.findOneAndUpdate(filter, update, { new: true, ...options } as any).select(select || "")
-        if(options?.populate){
-            doc.populate(options.populate as PopulateOptions[])
+        if(Array.isArray(update)){
+            update.push({$set : {__v : {$add : ["$__v" , 1]}}})
+            return await this.model.findOneAndUpdate(filter, update,{...options}).select(select || "")
         }
-        return await doc.exec()
+        return await this.model.findOneAndUpdate(filter , update , {...options , inc : {__v : 1}}).select(select || "")
     }
-
 
     async findByIdAndUpdate({
         id ,

@@ -4,12 +4,21 @@ import { BadRequestException, ConflictException, NotFoundException } from "../..
 import { decrypt } from "../../Utils/security/encryption";
 import { PostRepository } from "../../DB/repositories/post.repo";
 import { PostModel } from "../../DB/Models/post.model";
-import { CreatePostDTO } from "./post.DTO";
+import { CreatePostDTO, ReactParamsPostDTO, ReactQueryPostDTO } from "./post.DTO";
 import { UserRepository } from "../../DB/repositories/user.repo";
-import { UserModel } from "../../DB/Models/user.model";
+import { HUserDocument, UserModel } from "../../DB/Models/user.model";
 import { NotificationService } from "../../Utils/services/notification.service";
 import { Types } from "mongoose";
 import { getFCMs } from "../../DB/redis.repository";
+import { AvailabitlityEnum } from "../../Utils/enums/auth.enum";
+
+export const getAvailability = (user : HUserDocument) => {
+  return [
+    {availability : AvailabitlityEnum.PUBLIC },
+    {availability : AvailabitlityEnum.ONLY_ME , createdBy : user._id},
+    {tags : {$in : [ user._id ]}}    
+  ]
+}
 
 
 class PostService {
@@ -85,6 +94,41 @@ class PostService {
           })
            
 }
+
+
+       reactPost = async (req: Request, res: Response): Promise<Response> => {
+
+          const { postId }  = req.params
+          const { react }  = req.query
+
+          const post = await this._postRepo.findOneAndUpdate({
+            filter : {
+              _id : postId,
+              $or : getAvailability(req.user)
+
+            },
+            update : {
+              ...(Number(react)  > 0 ? 
+              {$addToSet : {likes : req.user._id}}
+               : {$pull : {likes :req.user._id}})
+            }
+          })
+
+          if(!post){
+            throw new NotFoundException("Fail to found matching post")
+          }
+
+
+          return successResponse({
+            res ,
+            statusCode : 200,
+            data : post
+          })
+
+}
+      
+        
+
 
 
 }
