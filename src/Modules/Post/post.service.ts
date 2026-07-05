@@ -30,6 +30,8 @@ class PostService {
           this._notificationService = new NotificationService()
         }
     
+        // task 1 kist app posts paginated
+
         createPost = async (req: Request, res: Response) : Promise<Response> => {
 
            const {content , availability , tags = []} : CreatePostDTO = req.body
@@ -95,7 +97,7 @@ class PostService {
            
 }
 
-
+        // add types of react (like, love, haha, wow, sad, angry) to the post
        reactPost = async (req: Request, res: Response): Promise<Response> => {
 
           const { postId }  = req.params
