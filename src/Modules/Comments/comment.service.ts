@@ -1,17 +1,102 @@
 import { Request, Response } from "express";
 import { successResponse } from "../../Utils/response/success.response";
+import { NotificationService } from "../../Utils/services/notification.service";
+import { UserRepository } from "../../DB/repositories/user.repo";
+import { PostRepository } from "../../DB/repositories/post.repo";
+import { UserModel } from "../../DB/Models/user.model";
+import { PostModel } from "../../DB/Models/post.model";
+import { getAvailability } from "../Post/post.service";
+import { NotFoundException } from "../../Utils/response/error.response";
+import { Types } from "mongoose";
+import { getFCMs } from "../../DB/redis.repository";
+import { CommentRepository } from "../../DB/repositories/comment.repo";
+import { CommentModel } from "../../DB/Models/comment.model";
 
 class CommentService {
-    constructor(){}
+        private readonly _userRepo = new UserRepository(UserModel)
+        private readonly _postRepo = new PostRepository(PostModel)
+        private readonly _commentRepo = new CommentRepository(CommentModel)
+
+        private readonly _notificationService : NotificationService
 
 
-    getComment = async (req : Request , res : Response ) : Promise<Response> => {
+
+
+    constructor(){
+            this._notificationService = new NotificationService()
+        
+    }
+
+
+    createComment = async (req : Request , res : Response ) : Promise<Response> => {
+
+
+        const {postId} = req.params
+        const {tags = [] , content} = req.body
+
+        const post = await this._postRepo.findOne({
+            filter : {_id : postId , $or : getAvailability(req.user)}
+        })
+
+        if(!post){
+            throw new NotFoundException("Fail to find matching post")
+        }
+
+        const tagged : Types.ObjectId[] = []
+        const FCM_Tokens : string[] = []
+
+        if(tags?.length){
+            const taggedAccounts = await this._userRepo.find({
+                filter :{
+                    _id : {$in : tags}
+                }
+            })
+
+            if(taggedAccounts.length != tags.length){
+                throw new NotFoundException("Fail to find some or all mentioned accounts")
+            }
+            for(const tag of tags){
+                tagged.push(tag)
+               const mentions = await getFCMs(tag)
+               mentions.map((token : string) => FCM_Tokens.push(token) )
+
+            }
+
+            const [comment] = await this._commentRepo.create({
+                data : [
+                    {
+                    createdBy : req.user._id,
+                    content : content as string,
+                    postId : post._id,
+                    tags : tagged
+
+                }
+            ]
+            }) || []
+
+            if(FCM_Tokens.length && comment){
+            await this._notificationService.sendNotifications({
+              tokens : FCM_Tokens,
+              data : {
+                title : "Post Mention",
+                body : JSON.stringify({
+                  message : `${req.user.username} mentioned you in a post `,
+                  postId : post._id,
+                  commentId : comment._id 
+                })
+              }
+            })
+          }
+
+        }
+
+
+
 
         return successResponse({
             res,
-            statusCode : 200,
-            message : "welcome to comment service"
-
+            message : "Comment created successfully",
+            statusCode : 201
         })
 
     }
