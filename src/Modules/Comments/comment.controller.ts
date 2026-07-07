@@ -12,7 +12,16 @@ router.post("/create" ,
     authentication({tokenType : TokenTypeEnum.ACCESS}),
     authorization({accessRoles : [RoleEnum.ADMIN , RoleEnum.USER]}),
     validation(commentValidation.createCommentSchema),
-    commentService.createComment)
+    commentService.createComment
+)
+
+router.post("/:commentId/reply" ,
+    authentication({tokenType : TokenTypeEnum.ACCESS}),
+    authorization({accessRoles : [RoleEnum.ADMIN , RoleEnum.USER]}),
+    validation(commentValidation.replyCommentSchema),
+    commentService.createReply
+)
+
 
 
 export default router

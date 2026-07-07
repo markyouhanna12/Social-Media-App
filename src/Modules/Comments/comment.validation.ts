@@ -23,3 +23,13 @@ export const createCommentSchema = {
             }
     })
 }
+
+
+export const replyCommentSchema = {
+    params : z.strictObject({
+        postId : generalFields.id,
+        commentId : generalFields.id
+
+    }),
+    body : createCommentSchema.body
+}
