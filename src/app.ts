@@ -11,9 +11,34 @@ import UserRouter from "./Modules/User/user.controller"
 import { redisConnection } from "./DB/redis.connection"
 import { notification } from "./Utils/services/notification.service"
 import PostRouter from "./Modules/Post/post.controller"
-// import CommentsRouter from "./Modules/Comments/comments.controller"
+import { GraphQLInt, GraphQLObjectType, GraphQLSchema, GraphQLString } from "graphql"
+import { createHandler } from "graphql-http/lib/use/express"
 
 const app = express()
+
+
+const schema = new GraphQLSchema({
+    query : new GraphQLObjectType({
+        name : "RootQueryType",
+        description : "First GraphQL API optional",
+        fields : {
+
+            sayHi : {
+                type : GraphQLString,
+                resolve () {
+                    return "Hello From GraphQL API"
+                }
+            },
+            hello : {
+                type : GraphQLInt,
+                resolve (){
+                    return 1200
+                }
+            }
+
+        }
+    })
+})
 
 connectDB()
 redisConnection()
@@ -23,17 +48,11 @@ app.use(cors(corsOptions))
 app.use(helmet())
 app.use(customRateLimiter)
 
-// app.post("/send-notification" , (req : Request , Response : Response) =>{
-//     notification.sendNotification({token : req.body.token , data : {
-//         title : "First notification",
-//         body : "body of notification"
-//     }})
-// })
 
+app.all("/graphql", createHandler({schema}))
 app.use("/api/auth", AuthRouter)
 app.use("/api/user", UserRouter)
 app.use("/api/post", PostRouter)
-// app.use("/api/comments", CommentsRouter)
 
 app.use(globalErrorHandler)
 
