@@ -128,10 +128,20 @@ class PostService {
           })
 
 }
+
+      async getPosts(user : HUserDocument){
+        const posts = await this._postRepo.find({
+          filter : {
+            $or : getAvailability(user)
+          },
+          options : {
+            populate : [{path:"createdBy" } , {path : "comments"}]
+          }
+        })
+
+        return posts
+      }
       
-        
-
-
 
 }
 

@@ -83,5 +83,11 @@ const postSchema = new Schema<IPost>({
     }
 })
 
+postSchema.virtual("comments",{
+    localField : "_id",
+    foreignField : "postId",
+    ref : "Comment"
+})
+
 
 export const PostModel = model<IPost>("Post", postSchema)
