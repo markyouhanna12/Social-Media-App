@@ -11,6 +11,8 @@ import { redisConnection } from "./DB/redis.connection"
 import PostRouter from "./Modules/Post/post.controller"
 import { createHandler } from "graphql-http/lib/use/express"
 import { schema } from "./Modules/GraphQL/index"
+import { authentication } from "./Middlewares/Auth.middleware"
+import { TokenTypeEnum } from "./Utils/enums/auth.enum"
 
 const app = express()
 
@@ -24,7 +26,8 @@ app.use(cors(corsOptions))
 app.use(helmet())
 app.use(customRateLimiter)
 
-app.all("/graphql" , createHandler({schema : schema}))
+app.all("/graphql" ,authentication({tokenType : TokenTypeEnum.ACCESS}), 
+createHandler({schema : schema , context : (req) => ({user : req.raw.user})}))
 
 app.use("/api/auth", AuthRouter)
 app.use("/api/user", UserRouter)
