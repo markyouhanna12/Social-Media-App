@@ -1,5 +1,6 @@
 import { GraphQLObjectType, GraphQLSchema } from "graphql";
 import { userGqlSchema } from "../User/GQL/user.schema.GQL";
+import { postGQLSchema } from "../Post/GQL/post.schema.GQL";
 
 
 const query = new GraphQLObjectType({
@@ -7,7 +8,8 @@ const query = new GraphQLObjectType({
     description : "first description optional",
     fields : {
 
-        ...userGqlSchema.registerQuery()
+        ...userGqlSchema.registerQuery(),
+        ...postGQLSchema.registerQuery()
 
     }
 
