@@ -11,34 +11,12 @@ import UserRouter from "./Modules/User/user.controller"
 import { redisConnection } from "./DB/redis.connection"
 import { notification } from "./Utils/services/notification.service"
 import PostRouter from "./Modules/Post/post.controller"
-import { GraphQLInt, GraphQLObjectType, GraphQLSchema, GraphQLString } from "graphql"
+import { GraphQLBoolean, GraphQLFloat, GraphQLID, GraphQLInt, GraphQLList, GraphQLObjectType, GraphQLSchema, GraphQLString } from "graphql"
 import { createHandler } from "graphql-http/lib/use/express"
 
 const app = express()
 
 
-const schema = new GraphQLSchema({
-    query : new GraphQLObjectType({
-        name : "RootQueryType",
-        description : "First GraphQL API optional",
-        fields : {
-
-            sayHi : {
-                type : GraphQLString,
-                resolve () {
-                    return "Hello From GraphQL API"
-                }
-            },
-            hello : {
-                type : GraphQLInt,
-                resolve (){
-                    return 1200
-                }
-            }
-
-        }
-    })
-})
 
 connectDB()
 redisConnection()
@@ -49,7 +27,6 @@ app.use(helmet())
 app.use(customRateLimiter)
 
 
-app.all("/graphql", createHandler({schema}))
 app.use("/api/auth", AuthRouter)
 app.use("/api/user", UserRouter)
 app.use("/api/post", PostRouter)
