@@ -11,7 +11,6 @@ const httpServer = createServer(app);
 const io = new Server(httpServer, {
     cors: {
         origin: "*", // change this in production
-        methods: ["GET", "POST"],
     },
 });
 initializeSocket(io);
