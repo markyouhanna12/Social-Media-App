@@ -5,9 +5,12 @@ client.on("connect" , () =>{
     
 })
 
-
-
 client.on("product" , (data) => {
     console.log({data});
     
 })
+
+client.emit("sayHi" , "Hello from Socket Client to Backend Server" , (res) =>{
+    console.log({res});
+    
+});
