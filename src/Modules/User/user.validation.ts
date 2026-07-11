@@ -6,3 +6,10 @@ export const sendFriendRequestSchema = {
         userId : generalFields.id
     })
 }
+
+
+export const acceptFriendRequestSchema = {
+    params : z.strictObject({
+        requestId : generalFields.id
+    })
+}

@@ -1,4 +1,4 @@
-import { Schema , HydratedDocument } from "mongoose";
+import { Schema , HydratedDocument, Types } from "mongoose";
 import { GenderEnum, ProviderEnum, RoleEnum } from "../../Utils/enums/auth.enum";
 import mongoose from "mongoose";
 import { BadRequestException } from "../../Utils/response/error.response";
@@ -36,6 +36,8 @@ export interface IUser {
     provider? : string;
 
     profilePic? : string;
+
+    friends? : Types.ObjectId[]
 }
         
 
@@ -101,7 +103,13 @@ export const userSchema = new Schema<IUser>({
     },
     profilePic : {
         type : String
-    }
+    },
+    friends : [
+        {
+        type : [Schema.Types.ObjectId],
+        ref : "User"
+        }
+    ]
 
 
 

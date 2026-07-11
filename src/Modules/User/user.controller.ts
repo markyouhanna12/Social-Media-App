@@ -28,4 +28,13 @@ router.post(
 
 )
 
+router.patch(
+    "/:requestId/accept",
+    authentication({tokenType : TokenTypeEnum.ACCESS}),
+    authorization({accessRoles : [RoleEnum.ADMIN , RoleEnum.USER]}),
+    validation(userValidations.acceptFriendRequestSchema),
+    userService.acceptFriendRequest
+
+)
+
 export default router
