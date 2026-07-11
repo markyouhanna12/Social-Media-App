@@ -1,20 +1,38 @@
-import { Server } from "socket.io";
+import { Server, Socket } from "socket.io";
+import { TokenService } from "../Utils/services/token";
+import { TokenTypeEnum } from "../Utils/enums/auth.enum";
 
 export const initializeSocket = (io: Server) => {
     //http:localhost:3000/
+
+    const connectedSockets = new Map <string , string>()
+
+    io.use(async(socket : Socket , next) =>{
+       try {
+        const tokenService = new TokenService()
+        const {user , decoded} = await tokenService.decodedToken({
+            authorization : socket.handshake.auth.authorization,
+            tokenType : TokenTypeEnum.ACCESS
+        })
+
+        connectedSockets.set(user._id.toString() , socket.id)
+        next()
+        
+       } catch (error : any) {
+        next(error)
+       }
+    })
+    
     io.on("connection", (socket) => {
         console.log(`Connected: ${socket.id}`);
-
-        // socket.emit("product" , { id : 1, title : "apple laptop", price : 2000})
-        socket.on("sayHi", (data , callback) =>{
-            console.log(data);
-            callback("Hi from Backend I recievied all the Data")
-            
-        } )
-
+        console.log(connectedSockets);
+        
 
         socket.on("disconnect", () => {
             console.log(`Disconnected: ${socket.id}`);
+            connectedSockets.delete("6a3e0cc1bdfb5092afccf958")
+            console.log(connectedSockets);
+            
         });
     });
 

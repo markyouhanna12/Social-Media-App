@@ -2,7 +2,7 @@ import chalk from "chalk"
 import app from "./app"
 import { PORT } from "./config/config.service";
 import { createServer } from "http";
-import { Server } from "socket.io";
+import { Server, Socket } from "socket.io";
 import { initializeSocket } from "./Socket/socket";
 
 
@@ -13,6 +13,7 @@ const io = new Server(httpServer, {
         origin: "*", // change this in production
     },
 });
+
 initializeSocket(io);
 
 const startServer = async () => {
