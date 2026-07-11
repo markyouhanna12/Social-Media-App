@@ -2,4 +2,4 @@
 /dist
 /src/config/.env.dev
 /src/config/*.json
-/FE/node_modules/
+/Front-Chat/node_modules/
