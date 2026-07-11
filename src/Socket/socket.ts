@@ -11,7 +11,7 @@ export const initializeSocket = (io: Server) => {
        try {
         const tokenService = new TokenService()
         const {user , decoded} = await tokenService.decodedToken({
-            authorization : socket.handshake.auth.authorization,
+            authorization : socket.handshake.auth["authorization"],
             tokenType : TokenTypeEnum.ACCESS
         })
 
