@@ -3,7 +3,7 @@ import app from "./app"
 import { PORT } from "./config/config.service";
 import { createServer } from "http";
 import { Server, Socket } from "socket.io";
-import { initializeSocket } from "./Socket/socket";
+import { initializeSocket } from "./Modules/gateway/socket";
 
 
 const httpServer = createServer(app);
