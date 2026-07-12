@@ -16,10 +16,11 @@ class UserService {
         constructor(){}
     
       getProfile = async (user : any) =>{
+        
         user.phone = await decrypt(user.phone)
         return {
           message : "User Profile",
-          data : user
+          user : user
         }
       }
 

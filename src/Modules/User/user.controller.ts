@@ -13,9 +13,11 @@ router.get(
     authentication({tokenType: TokenTypeEnum.ACCESS}),
     authorization({accessRoles:[RoleEnum.USER]}),
     async (req : Request , res : Response) => {
-        const user = req.user
-        const data = await userService.getProfile(user)
-        return successResponse({res,message:"Done",statusCode:200,data})
+        await req.user?.populate("friends")
+        console.log(req.user)
+        const userprofile = req.user
+        const user = await userService.getProfile(userprofile)
+        return successResponse({res,message:"Done",statusCode:200,data:user})
     }
 )
 

@@ -106,7 +106,7 @@ export const userSchema = new Schema<IUser>({
     },
     friends : [
         {
-        type : [Schema.Types.ObjectId],
+        type : Schema.Types.ObjectId,
         ref : "User"
         }
     ]

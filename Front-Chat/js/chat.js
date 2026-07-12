@@ -5,14 +5,14 @@ let meImage = "./avatar/Avatar-No-Background.png";
 let friendImage = "./avatar/Avatar-No-Background.png";
 
 const classicToken = localStorage.getItem("token");
-const token = `Bearer ${classicToken}`;
+const token = `User ${classicToken}`;
 let globalProfile = {};
 const headers = {
   "Content-Type": "application/json; charset=UTF-8",
   authorization: token,
 };
 const clintIo = io(baseURL, {
-  auth: { authorization: classicToken },
+  auth: { authorization: token },
 });
 
 clintIo.on("likePost", (data) => {
@@ -303,13 +303,13 @@ function displayGroupChat(groupId) {
 function getUserData() {
   axios({
     method: "get",
-    url: `${baseURL}/user`,
+    url: `${baseURL}/api/user/profile`,
     headers,
   })
     .then(function (response) {
-      console.log({ D: response.data });
+      console.log(response.data);
 
-      const { user, groups } = response.data?.data;
+      const { user, groups } = response.data.data;
       console.log({ user });
 
       globalProfile = user;
@@ -318,7 +318,7 @@ function getUserData() {
         imagePath = `${baseURL}/uploads/${user.profilePicture}`;
       }
       document.getElementById("profileImage").src = imagePath;
-      document.getElementById("userName").innerHTML = `${user.userName}`;
+      document.getElementById("userName").innerHTML = `${user.username}`;
       showUsersData(user.friends);
       showGroupList(groups);
     })
@@ -337,7 +337,7 @@ function showUsersData(users = []) {
     cartonna += `
         <div onclick="displayChatUser('${users[i]._id}')" class="chatUser my-2">
         <img class="chatImage" src="${imagePath}" alt="" srcset="">
-        <span class="ps-2">${users[i].userName}</span>
+        <span class="ps-2">${users[i].username}</span>
         <span id="${"c_" + users[i]._id}" class="ps-2 closeSpan">
            🟢
         </span>

@@ -10,14 +10,14 @@ $("#login").click(() => {
     console.log({ data });
     axios({
         method: 'post',
-        url: `${baseURL}/auth/login`,
+        url: `${baseURL}/api/auth/login`, //login api
         data: data,
         headers: { 'Content-Type': 'application/json; charset=UTF-8' }
     }).then(function (response) {
         console.log({ response });
-        const { msg, data } = response.data
-        if (msg == "done") {
-            localStorage.setItem('token', data.access_token);
+        const { message, data } = response.data
+        if (message == "Login successful") {   
+            localStorage.setItem('token', data.credentails.accessToken);
             window.location.href = 'chat.html';
         } else {
             console.log("In-valid email or password");
