@@ -5,8 +5,11 @@ import { RoleEnum, TokenTypeEnum } from "../../Utils/enums/auth.enum";
 import { successResponse } from "../../Utils/response/success.response";
 import { validation } from "../../Middlewares/Validation.middleware";
 import * as userValidations from "./user.validation"
+import chatRouter from "../chat/chat.controller"
 
 const router: Router  = express.Router()
+
+router.use("/:userId/chat" , chatRouter)
 
 router.get(
     "/profile",
