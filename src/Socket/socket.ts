@@ -1,13 +1,22 @@
 import { Server, Socket } from "socket.io";
 import { TokenService } from "../Utils/services/token";
 import { TokenTypeEnum } from "../Utils/enums/auth.enum";
+import { HUserDocument } from "../DB/Models/user.model";
+import { JwtPayload } from "jsonwebtoken";
 
 export const initializeSocket = (io: Server) => {
     //http:localhost:3000/
 
-    const connectedSockets = new Map <string , string>()
+        interface IAuthSocket extends Socket {
+        credentails? : {
+            user : Partial<HUserDocument>,
+            decoded : JwtPayload
+        }
+    }
 
-    io.use(async(socket : Socket , next) =>{
+    const connectedSockets = new Map <string , string[]>()
+
+    io.use(async(socket : IAuthSocket , next) =>{
        try {
         const tokenService = new TokenService()
         const {user , decoded} = await tokenService.decodedToken({
@@ -15,7 +24,14 @@ export const initializeSocket = (io: Server) => {
             tokenType : TokenTypeEnum.ACCESS
         })
 
-        connectedSockets.set(user._id.toString() , socket.id)
+        const userTabs = connectedSockets.get(user._id.toString()) || []
+        userTabs.push(socket.id)
+
+        connectedSockets.set(user._id.toString() , userTabs)
+
+        socket.credentails = {user , decoded}
+
+
         next()
         
        } catch (error : any) {
@@ -23,14 +39,24 @@ export const initializeSocket = (io: Server) => {
        }
     })
     
-    io.on("connection", (socket) => {
+    io.on("connection", (socket : IAuthSocket) => {
         console.log(`Connected: ${socket.id}`);
-        console.log(connectedSockets);
+        console.log(connectedSockets);        
         
 
         socket.on("disconnect", () => {
             console.log(`Disconnected: ${socket.id}`);
-            connectedSockets.delete("6a3e0cc1bdfb5092afccf958")
+            const userId = socket.credentails?.user._id?.toString() as string
+            let remainingTabs = connectedSockets.get(userId)?.filter((tab) =>{
+                return tab !== socket.id
+            }) || []
+
+            if(remainingTabs.length){
+                connectedSockets.set(userId , remainingTabs)
+            }else{
+                connectedSockets.delete(userId)
+            }
+
             console.log(connectedSockets);
             
         });
