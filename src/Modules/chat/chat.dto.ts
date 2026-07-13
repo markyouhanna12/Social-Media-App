@@ -8,5 +8,11 @@ export interface ISayHiDTO {
     callback : any;
 }
 
+export interface ISendMessageDTO {
+    content : string;
+    socket : IAuthSocket;
+    sendTo : string;
+}
+
 
 export type IGetchatDTO = z.infer<typeof getChatSchema.params>

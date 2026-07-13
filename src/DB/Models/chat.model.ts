@@ -7,7 +7,7 @@ export interface IMessage {
 
     content : string;
     createdBy : Types.ObjectId;
-    createdAt : Date;
+    createdAt ?: Date;
     updatedAt? : Date;
 
   

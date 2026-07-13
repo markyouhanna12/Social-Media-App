@@ -8,6 +8,7 @@ export class ChatGateway {
     register = (socket : IAuthSocket) =>{
 
         this._chatEvent.sayHi(socket)
+        this._chatEvent.sendMessage(socket)
         
     }
 }

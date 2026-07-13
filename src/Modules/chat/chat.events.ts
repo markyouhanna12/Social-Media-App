@@ -11,4 +11,15 @@ export class ChatEvents {
             this._chatService.sayHi({message , socket , callback})
         })
     }
+
+    sendMessage = (socket : IAuthSocket) => {
+        return socket.on("sendMessage" ,(
+            data : {content : string; sendTo : string}
+        ) => {
+            this._chatService.sendMessage({...data , socket})
+        }
+    )
+    
+    }
+      
 }

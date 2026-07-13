@@ -177,7 +177,7 @@ function displayChatUser(userId) {
   console.log({ userId });
   axios({
     method: "get",
-    url: `${baseURL}/user/${userId}/chat?page=2&size=3`,
+    url: `${baseURL}/api/user/${userId}/chat`,
     headers,
   })
     .then(function (response) {
