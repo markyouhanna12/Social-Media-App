@@ -13,7 +13,7 @@ const blockedIPs = new Set()
 
 const unBlockerTimers = new Map<string, NodeJS.Timeout>();
 
-const RATE_LIMIT = 5
+const RATE_LIMIT = 20
 const WINDOW_MS = 60 * 1000 // 1 minute
 
 export const customRateLimiter = (

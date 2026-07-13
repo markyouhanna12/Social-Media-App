@@ -4,11 +4,16 @@ import { TokenTypeEnum } from "../../Utils/enums/auth.enum";
 import { IAuthSocket } from "./gateway.dto";
 import { ChatGateway } from "../chat/chat.gateway";
 
-export const initializeSocket = (io: Server) => {
-    //http:localhost:3000/
 
-    const connectedSockets = new Map <string , string[]>()
-    // middleware to authenticate the socket connection
+export let socketServer: Server;
+
+export const connectedSockets = new Map <string , string[]>()
+
+
+export const initializeSocket = (io: Server) => {
+    
+    socketServer = io;
+
     io.use(async(socket : IAuthSocket , next) =>{
        try {
         const tokenService = new TokenService()

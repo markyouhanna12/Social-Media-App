@@ -181,8 +181,8 @@ function displayChatUser(userId) {
     headers,
   })
     .then(function (response) {
-      const { chat } = response.data?.data;
-      console.log({ chat });
+      const  chat  = response.data.data;
+      console.log( chat );
       if (chat) {
         if (
           chat.participants[0]._id.toString() == globalProfile._id.toString()

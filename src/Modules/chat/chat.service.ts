@@ -7,6 +7,8 @@ import { UserRepository } from "../../DB/repositories/user.repo";
 import { UserModel } from "../../DB/Models/user.model";
 import { Types } from "mongoose";
 import { BadRequestException, NotFoundException } from "../../Utils/response/error.response";
+import { socketServer , connectedSockets } from "../gateway/socket";
+
 
 export class ChatService {
 
@@ -67,7 +69,6 @@ export class ChatService {
 
         try {
             const createdBy = socket.credentails?.user?._id as Types.ObjectId
-            console.log(content , sendTo , createdBy);
 
             const user = await this._userModel.findOne({
                 filter:{
@@ -116,6 +117,25 @@ export class ChatService {
             }
 
             socket.emit("successMessage" , {content , sendTo})
+
+
+            const receiverSockets = connectedSockets.get(sendTo)            
+            if(receiverSockets?.length){
+                const payload = {
+                    content,
+                    from: {
+                    _id: createdBy,
+                    username: socket.credentails?.user.username,
+                    profilePicture : socket.credentails?.user.profilePic
+                    }
+                    };
+
+                    receiverSockets.forEach(socketId => {
+                    socketServer.to(socketId).emit("newMessage", payload);
+                        });
+
+                   
+            }
             
         } catch (error) {
             socket.emit("custom_error" , error)
